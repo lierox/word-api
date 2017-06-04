@@ -24,6 +24,15 @@ app.post('/words', (req, res) => {
   });
 });
 
+app.get('/words', (req, res) => {
+  Word.find().then( (result)=> {
+    res.send({result})
+  }, (error) => {
+    console.log(error);
+    res.status(400).send(error);
+  });
+});
+
 app.listen(3000, () => {
   console.log('Server On');
 });

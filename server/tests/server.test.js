@@ -1,12 +1,15 @@
 const expect = require('expect');
 const request = require('supertest');
+var {ObjectID} = require('mongodb');
 
 const {app} = require('./../server');
 const {Word} = require('./../models/word');
 
 const words = [{
+    _id: new ObjectID(),
     name: "word1"
   },{
+    _id: new ObjectID(),
     name: "word2"
   }];
 
@@ -55,6 +58,9 @@ describe('post word', () => {
     });
   });
 
+});
+
+describe('GET docs', () => {
   it('get all words', (done) => {
     request(app)
     .get('/words')
@@ -64,5 +70,32 @@ describe('post word', () => {
     })
     .end(done);
   });
-
 });
+
+describe('GET one doc', () => {
+  it('get one word', (done) => {
+    request(app)
+    .get(`/words/${words[0]._id.toHexString()}`)
+    .expect(200)
+    .expect((res) => {
+      expect(res.body.result.name).toBe(words[0].name);
+    })
+    .end(done);
+  });
+
+  it('404 for valid id but object not found', (done) => {
+    var id = new ObjectID().toHexString();
+    request(app)
+    .get(`/words/${id}`)
+    .expect(404)
+    .end(done);
+  })
+
+  it('404 for invalid id', (done) => {
+    request(app)
+    .get(`/words/iminvalid`)
+    .expect(404)
+    .end(done);
+  })
+
+})

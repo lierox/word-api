@@ -27,3 +27,5 @@ app.post('/words', (req, res) => {
 app.listen(3000, () => {
   console.log('Server On');
 });
+
+module.exports = {app};

@@ -4,8 +4,16 @@ const request = require('supertest');
 const {app} = require('./../server');
 const {Word} = require('./../models/word');
 
+const words = [{
+    name: "word1"
+  },{
+    name: "word2"
+  }];
+
 beforeEach((done) => {
-  Word.remove({}).then((res) => done());
+  Word.remove({}).then(() =>{
+    return Word.insertMany(words);
+  }).then(() => done());
 });
 
 describe('post word', () => {
@@ -23,7 +31,7 @@ describe('post word', () => {
         return done(error);
       }
 
-      Word.find().then((words) => {
+      Word.find({name}).then((words) => {
         expect(words.length).toBe(1);
         expect(words[0].name).toBe(name);
         done();
@@ -41,9 +49,20 @@ describe('post word', () => {
         return done(error);
       }
       Word.find().then((words) => {
-        expect(words.length).toBe(0);
+        expect(words.length).toBe(2);
         done();
       }).catch((error) => done(error));
     });
   });
+
+  it('get all words', (done) => {
+    request(app)
+    .get('/words')
+    .expect(200)
+    .expect((res) => {
+      expect(res.body.result.length).toBe(2);
+    })
+    .end(done);
+  });
+
 });

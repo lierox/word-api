@@ -1,6 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-
+var {ObjectID} = require('mongodb');
 var {mongoose} = require('./db/mongoose');
 var {Word} = require('./models/word');
 var {User} = require('./models/user');
@@ -30,6 +30,23 @@ app.get('/words', (req, res) => {
   }, (error) => {
     console.log(error);
     res.status(400).send(error);
+  });
+});
+
+app.get('/words/:id', (req,res) => {
+  var id = req.params.id;
+  if(!ObjectID.isValid(id)){
+    console.log('invalid id');
+    return res.status(404).send();
+  }
+
+  Word.findById(id).then((result) => {
+    if(!result){
+      return res.status(404).send();
+    }
+    res.status(200).send({result});
+  }).catch(() => {
+    res.status(400).send()
   });
 });
 
